@@ -107,44 +107,67 @@ svg.append("g")
     .style("text-anchor", "end")
     .text("GERD");
 
+var div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
 
 // draw chart
+draw(data);
 
+function draw(data) {
+    svg.selectAll('bar').data(data)
+        .enter()
+        .append('rect')
+        .style('fill', "steelblue")
+        .attr("x", function (data) {
+            return x(data.country);
+        })
+        .transition()
+            .duration(500)
+            .delay(function(d, i) { return i * 50; })
+            .attr('width', x.rangeBand())
+            .attr('y', function (data) {
+                return (height - z(data.GERD));
+            })
+        .attr('height', function (data) {
+            return z(data.GERD);
+        });
 
-svg.selectAll('bar').data(data)
-    .enter()
-    .append('rect')
-    .style('fill', "steelblue")
-    .attr("x", function (data) {
-        return x(data.country);
-    })
-    .attr('width', x.rangeBand())
-    .attr('y', function (data) {
-        return (height - z(data.GERD));
-    })
-    .attr('height', function (data) {
-        return z(data.GERD);
-    });
-var populationLine = d3.svg.line()
-.x(function (data) { return x(data.country)+6;})
-.y(function (data) { return y(data.population)})
-.interpolate('cardinal');
+    svg.selectAll("rect")
+        .on("mouseover", function(d){
+            div.transition()
+                .duration(200)
+                .style("opacity", .9);
+            div	.html(d.GERD)
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+        })
+        .on("mouseout", function(d){
+            div.transition()
+                .duration(500)
+                .style("opacity", 0);
+        });
+    var populationLine = d3.svg.line()
+        .x(function (data) { return x(data.country)+6;})
+        .y(function (data) { return y(data.population)})
+        .interpolate('cardinal');
 
-svg.append("path")
-    .attr("class", "line")
-    .attr("d", populationLine(data))
-    .style({"stroke":"red", "stroke-width":"1.5px", "fill":"none"});
+    svg.append("path")
+        .attr("class", "line")
+        .attr("d", populationLine(data))
+        .style({"stroke":"red", "stroke-width":"1.5px", "fill":"none"});
 
-var GDPcapLine = d3.svg.line()
-    .x(function (data) {
-        return x(data.country)+6;
-    })
-    .y(function (data) {
-        return y(data.GDPcap)
-    })
-    .interpolate('cardinal');
+    var GDPcapLine = d3.svg.line()
+        .x(function (data) {
+            return x(data.country)+6;
+        })
+        .y(function (data) {
+            return y(data.GDPcap)
+        })
+        .interpolate('cardinal');
 
-svg.append("path")
-    .attr("class", "line")
-    .attr('d', GDPcapLine(data))
-    .style({"stroke":"blue", "stroke-width":"1.5px", "fill":"none"});
+    svg.append("path")
+        .attr("class", "line")
+        .attr('d', GDPcapLine(data))
+        .style({"stroke":"blue", "stroke-width":"1.5px", "fill":"none"});
+}
