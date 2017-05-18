@@ -126,7 +126,7 @@ svg.selectAll('bar').data(data)
         return z(data.GERD);
     });
 var populationLine = d3.svg.line()
-.x(function (data) { return x(data.country);})
+.x(function (data) { return x(data.country)+6;})
 .y(function (data) { return y(data.population)})
 .interpolate('cardinal');
 
@@ -137,7 +137,7 @@ svg.append("path")
 
 var GDPcapLine = d3.svg.line()
     .x(function (data) {
-        return x(data.country)
+        return x(data.country)+6;
     })
     .y(function (data) {
         return y(data.GDPcap)
